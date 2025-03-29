@@ -1,6 +1,7 @@
 import https from "https";
 import createClient from "openapi-fetch";
 import type { paths } from "./api/types";
+import logger from "./logger";
 
 export interface ObsidianClientConfig {
   baseUrl: string;
@@ -48,6 +49,15 @@ export class ObsidianClient {
   // Helper method to transform client responses to match ApiResponse type
   private transformResponse<T>(response: any): ApiResponse<T> {
     if (response.error) {
+      logger.error(
+        {
+          status: response.response?.status || 500,
+          statusText: response.response?.statusText || "Error",
+          error: response.error,
+        },
+        "API error response"
+      );
+
       return {
         error: {
           status: response.response?.status || 500,
@@ -65,17 +75,20 @@ export class ObsidianClient {
       paths["/"]["get"]["responses"]["200"]["content"]["application/json"]
     >
   > {
+    logger.debug("Getting Obsidian status");
     const response = await this.client.GET("/");
     return this.transformResponse(response);
   }
 
   // Active File
   async getActiveFile(): Promise<ApiResponse<string>> {
+    logger.debug("Getting active file content");
     const response = await this.client.GET("/active/");
     return this.transformResponse(response);
   }
 
   async updateActiveFile(content: string): Promise<ApiResponse<void>> {
+    logger.debug("Updating active file");
     const response = await this.client.PUT("/active/", {
       body: content,
     });
@@ -83,6 +96,7 @@ export class ObsidianClient {
   }
 
   async appendToActiveFile(content: string): Promise<ApiResponse<void>> {
+    logger.debug("Appending to active file");
     const response = await this.client.POST("/active/", {
       body: content,
     });
@@ -90,12 +104,14 @@ export class ObsidianClient {
   }
 
   async deleteActiveFile(): Promise<ApiResponse<void>> {
+    logger.debug("Deleting active file");
     const response = await this.client.DELETE("/active/");
     return this.transformResponse(response);
   }
 
   // Vault Files
   async getFile(filename: string): Promise<ApiResponse<string>> {
+    logger.debug({ filename }, "Getting file content");
     const response = await this.client.GET("/vault/{filename}", {
       params: {
         path: {
@@ -110,6 +126,7 @@ export class ObsidianClient {
     filename: string,
     content: string
   ): Promise<ApiResponse<void>> {
+    logger.debug({ filename }, "Creating or updating file");
     const response = await this.client.PUT("/vault/{filename}", {
       params: {
         path: {
@@ -125,6 +142,7 @@ export class ObsidianClient {
     filename: string,
     content: string
   ): Promise<ApiResponse<void>> {
+    logger.debug({ filename }, "Appending to file");
     const response = await this.client.POST("/vault/{filename}", {
       params: {
         path: {
@@ -137,6 +155,7 @@ export class ObsidianClient {
   }
 
   async deleteFile(filename: string): Promise<ApiResponse<void>> {
+    logger.debug({ filename }, "Deleting file");
     const response = await this.client.DELETE("/vault/{filename}", {
       params: {
         path: {
@@ -155,6 +174,7 @@ export class ObsidianClient {
       paths["/vault/"]["get"]["responses"]["200"]["content"]["application/json"]
     >
   > {
+    logger.debug({ path: path || "root" }, "Listing directory");
     let response;
     if (path === "") {
       response = await this.client.GET("/vault/");
@@ -176,11 +196,13 @@ export class ObsidianClient {
       paths["/commands/"]["get"]["responses"]["200"]["content"]["application/json"]
     >
   > {
+    logger.debug("Getting Obsidian commands");
     const response = await this.client.GET("/commands/");
     return this.transformResponse(response);
   }
 
   async executeCommand(commandId: string): Promise<ApiResponse<void>> {
+    logger.debug({ commandId }, "Executing command");
     const response = await this.client.POST("/commands/{commandId}/", {
       params: {
         path: {
@@ -196,6 +218,7 @@ export class ObsidianClient {
     query: string,
     contextLength: number = 100
   ): Promise<ApiResponse<any>> {
+    logger.debug({ query, contextLength }, "Searching vault");
     const response = await this.client.POST("/search/simple/", {
       params: {
         query: {
@@ -212,6 +235,7 @@ export class ObsidianClient {
     filename: string,
     newLeaf: boolean = false
   ): Promise<ApiResponse<any>> {
+    logger.debug({ filename, newLeaf }, "Opening document");
     const response = await this.client.POST("/open/{filename}", {
       params: {
         path: {
@@ -229,6 +253,7 @@ export class ObsidianClient {
   async getPeriodicNote(
     period: "daily" | "weekly" | "monthly" | "quarterly" | "yearly"
   ): Promise<ApiResponse<string>> {
+    logger.debug({ period }, "Getting periodic note");
     const response = await this.client.GET("/periodic/{period}/", {
       params: {
         path: {
@@ -243,6 +268,7 @@ export class ObsidianClient {
     period: "daily" | "weekly" | "monthly" | "quarterly" | "yearly",
     content: string
   ): Promise<ApiResponse<void>> {
+    logger.debug({ period }, "Appending to periodic note");
     const response = await this.client.POST("/periodic/{period}/", {
       params: {
         path: {

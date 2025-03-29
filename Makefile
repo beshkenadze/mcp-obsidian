@@ -1,4 +1,4 @@
-.PHONY: install build lint test test-all test-integration start clean help act-build act-lint act-test act-release
+.PHONY: install build lint test test-all test-integration start clean help act-build act-lint act-test act-release debug
 
 # Default target
 all: install build lint test
@@ -39,6 +39,10 @@ generate-types:
 start:
 	bun start
 
+# Run the MCP Inspector for debugging
+debug:
+	MCP_DEBUG=true MCP_TRANSPORT=stdio npx @modelcontextprotocol/inspector bun run src/index.ts
+
 # Run precommit checks
 precommit:
 	bun run precommit
@@ -78,6 +82,7 @@ help:
 	@echo "  test-integration - Run integration tests"
 	@echo "  generate-types   - Generate TypeScript types"
 	@echo "  start            - Start the application"
+	@echo "  debug            - Run MCP Inspector for debugging"
 	@echo "  precommit        - Run precommit checks"
 	@echo "  clean            - Clean build artifacts"
 	@echo "  act-build        - Test build GitHub Action locally"

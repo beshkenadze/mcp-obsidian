@@ -36,6 +36,7 @@ The MCP server is configured using environment variables:
 - `PORT`: The port on which the MCP server will listen (default: 3000)
 - `OBSIDIAN_BASE_URL`: The URL of the Obsidian Local REST API (default: https://127.0.0.1:27124)
 - `OBSIDIAN_API_KEY`: Your Obsidian Local REST API key (required)
+- `SERVER_TYPE`: The server implementation to use - either 'bun' or 'express' (default: 'bun')
 
 You can set these variables in a `.env` file at the root of the project:
 
@@ -43,6 +44,7 @@ You can set these variables in a `.env` file at the root of the project:
 PORT=3000
 OBSIDIAN_BASE_URL=https://127.0.0.1:27124
 OBSIDIAN_API_KEY=your_api_key_here
+SERVER_TYPE=bun  # Options: bun, express
 ```
 
 ## Usage
@@ -58,6 +60,29 @@ bun run start
 ```
 
 The server will be available at `http://localhost:3000` (or the port you configured).
+
+### Server Implementation
+
+This MCP server supports two different server implementations:
+
+1. **Bun Server** (default): Uses Bun's native HTTP server implementation for optimal performance in Bun environments.
+2. **Express Server**: Uses Express.js for compatibility with Node.js environments and broader ecosystem support.
+
+You can switch between implementations by setting the `SERVER_TYPE` environment variable:
+
+```bash
+# For Bun server (default)
+SERVER_TYPE=bun bun run start
+
+# For Express server
+SERVER_TYPE=express bun run start
+```
+
+Both implementations provide identical functionality and API endpoints. The dual implementation approach allows for:
+
+- Testing in different environments
+- Compatibility with both Bun and Node.js deployments
+- Performance comparison between different server architectures
 
 ### Testing
 
