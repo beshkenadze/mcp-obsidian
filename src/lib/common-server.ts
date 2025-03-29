@@ -65,6 +65,73 @@ export class CommonMcpServer {
       }
     );
 
+    this.server.tool(
+      "obsidian_patch_active_file",
+      {
+        operation: z
+          .enum(["append", "prepend", "replace"])
+          .describe("Patch operation to perform"),
+        targetType: z
+          .enum(["heading", "block", "frontmatter"])
+          .describe("Type of target to patch"),
+        target: z.string().describe("Target to patch"),
+        content: z.string().describe("Content to insert"),
+        targetDelimiter: z
+          .string()
+          .optional()
+          .describe("Delimiter for nested targets (i.e. Headings)"),
+        trimTargetWhitespace: z
+          .boolean()
+          .optional()
+          .describe("Trim whitespace from Target before applying patch?"),
+      },
+      async ({
+        operation,
+        targetType,
+        target,
+        content,
+        targetDelimiter,
+        trimTargetWhitespace,
+      }) => {
+        // Create the headers explicitly typed
+        const headers = {
+          Operation: operation,
+          "Target-Type": targetType,
+          Target: target,
+        } as const;
+
+        // Add optional headers
+        const options: any = {
+          client: this.obsidianClient.client,
+          headers,
+          body: content,
+        };
+
+        if (targetDelimiter) {
+          options.headers = {
+            ...options.headers,
+            "Target-Delimiter": targetDelimiter,
+          };
+        }
+
+        if (trimTargetWhitespace !== undefined) {
+          options.headers = {
+            ...options.headers,
+            "Trim-Target-Whitespace": trimTargetWhitespace ? "true" : "false",
+          };
+        }
+
+        const response = await this.obsidianClient.sdk.patchActive(options);
+
+        return this.formatToolResponse(response);
+      }
+    );
+
+    this.server.tool("obsidian_delete_active_file", {}, async () => {
+      const result = await this.obsidianClient.deleteActiveFile();
+      return this.formatToolResponse(result);
+    });
+
     // File management tools
     this.server.tool(
       "obsidian_list_files",
@@ -128,6 +195,75 @@ export class CommonMcpServer {
     );
 
     this.server.tool(
+      "obsidian_patch_file",
+      {
+        filename: z
+          .string()
+          .describe("Path to the file (relative to vault root)"),
+        operation: z
+          .enum(["append", "prepend", "replace"])
+          .describe("Patch operation to perform"),
+        targetType: z
+          .enum(["heading", "block", "frontmatter"])
+          .describe("Type of target to patch"),
+        target: z.string().describe("Target to patch"),
+        content: z.string().describe("Content to insert"),
+        targetDelimiter: z
+          .string()
+          .optional()
+          .describe("Delimiter for nested targets (i.e. Headings)"),
+        trimTargetWhitespace: z
+          .boolean()
+          .optional()
+          .describe("Trim whitespace from Target before applying patch?"),
+      },
+      async ({
+        filename,
+        operation,
+        targetType,
+        target,
+        content,
+        targetDelimiter,
+        trimTargetWhitespace,
+      }) => {
+        // Create the headers explicitly typed
+        const headers = {
+          Operation: operation,
+          "Target-Type": targetType,
+          Target: target,
+        } as const;
+
+        // Add optional headers
+        const options: any = {
+          client: this.obsidianClient.client,
+          path: { filename },
+          headers,
+          body: content,
+        };
+
+        if (targetDelimiter) {
+          options.headers = {
+            ...options.headers,
+            "Target-Delimiter": targetDelimiter,
+          };
+        }
+
+        if (trimTargetWhitespace !== undefined) {
+          options.headers = {
+            ...options.headers,
+            "Trim-Target-Whitespace": trimTargetWhitespace ? "true" : "false",
+          };
+        }
+
+        const response = await this.obsidianClient.sdk.patchVaultByFilename(
+          options
+        );
+
+        return this.formatToolResponse(response);
+      }
+    );
+
+    this.server.tool(
       "obsidian_delete_file",
       {
         filename: z
@@ -137,6 +273,140 @@ export class CommonMcpServer {
       async ({ filename }) => {
         const result = await this.obsidianClient.deleteFile(filename);
         return this.formatToolResponse(result);
+      }
+    );
+
+    // Periodic Notes tools
+    this.server.tool(
+      "obsidian_get_periodic_note",
+      {
+        period: z
+          .enum(["daily", "weekly", "monthly", "quarterly", "yearly"])
+          .describe("Type of periodic note"),
+      },
+      async ({ period }) => {
+        const result = await this.obsidianClient.getPeriodicNote(period);
+        return this.formatToolResponse(result);
+      }
+    );
+
+    this.server.tool(
+      "obsidian_update_periodic_note",
+      {
+        period: z
+          .enum(["daily", "weekly", "monthly", "quarterly", "yearly"])
+          .describe("Type of periodic note"),
+        content: z.string().describe("New content for the note"),
+      },
+      async ({ period, content }) => {
+        const response = await this.obsidianClient.sdk.putPeriodicByPeriod({
+          client: this.obsidianClient.client,
+          path: { period },
+          body: content,
+        });
+        return this.formatToolResponse(response);
+      }
+    );
+
+    this.server.tool(
+      "obsidian_append_to_periodic_note",
+      {
+        period: z
+          .enum(["daily", "weekly", "monthly", "quarterly", "yearly"])
+          .describe("Type of periodic note"),
+        content: z.string().describe("Content to append"),
+      },
+      async ({ period, content }) => {
+        const result = await this.obsidianClient.appendToPeriodicNote(
+          period,
+          content
+        );
+        return this.formatToolResponse(result);
+      }
+    );
+
+    this.server.tool(
+      "obsidian_delete_periodic_note",
+      {
+        period: z
+          .enum(["daily", "weekly", "monthly", "quarterly", "yearly"])
+          .describe("Type of periodic note"),
+      },
+      async ({ period }) => {
+        const response = await this.obsidianClient.sdk.deletePeriodicByPeriod({
+          client: this.obsidianClient.client,
+          path: { period },
+        });
+        return this.formatToolResponse(response);
+      }
+    );
+
+    this.server.tool(
+      "obsidian_patch_periodic_note",
+      {
+        period: z
+          .enum(["daily", "weekly", "monthly", "quarterly", "yearly"])
+          .describe("Type of periodic note"),
+        operation: z
+          .enum(["append", "prepend", "replace"])
+          .describe("Patch operation to perform"),
+        targetType: z
+          .enum(["heading", "block", "frontmatter"])
+          .describe("Type of target to patch"),
+        target: z.string().describe("Target to patch"),
+        content: z.string().describe("Content to insert"),
+        targetDelimiter: z
+          .string()
+          .optional()
+          .describe("Delimiter for nested targets (i.e. Headings)"),
+        trimTargetWhitespace: z
+          .boolean()
+          .optional()
+          .describe("Trim whitespace from Target before applying patch?"),
+      },
+      async ({
+        period,
+        operation,
+        targetType,
+        target,
+        content,
+        targetDelimiter,
+        trimTargetWhitespace,
+      }) => {
+        // Create the headers explicitly typed
+        const headers = {
+          Operation: operation,
+          "Target-Type": targetType,
+          Target: target,
+        } as const;
+
+        // Add optional headers
+        const options: any = {
+          client: this.obsidianClient.client,
+          path: { period },
+          headers,
+          body: content,
+        };
+
+        if (targetDelimiter) {
+          options.headers = {
+            ...options.headers,
+            "Target-Delimiter": targetDelimiter,
+          };
+        }
+
+        if (trimTargetWhitespace !== undefined) {
+          options.headers = {
+            ...options.headers,
+            "Trim-Target-Whitespace": trimTargetWhitespace ? "true" : "false",
+          };
+        }
+
+        const response = await this.obsidianClient.sdk.patchPeriodicByPeriod(
+          options
+        );
+
+        return this.formatToolResponse(response);
       }
     );
 
@@ -153,6 +423,39 @@ export class CommonMcpServer {
       async ({ query, contextLength }) => {
         const result = await this.obsidianClient.search(query, contextLength);
         return this.formatToolResponse(result);
+      }
+    );
+
+    // Advanced search (using JsonLogic or Dataview)
+    this.server.tool(
+      "obsidian_advanced_search",
+      {
+        query: z
+          .any()
+          .describe("Search query (JsonLogic object or Dataview query string)"),
+        searchType: z
+          .enum(["jsonlogic", "dataview"])
+          .describe("Type of search query"),
+      },
+      async ({ query, searchType }) => {
+        const contentType =
+          searchType === "jsonlogic"
+            ? "application/vnd.olrapi.jsonlogic+json"
+            : "application/vnd.olrapi.dataview.dql+txt";
+
+        const queryBody =
+          typeof query === "string" ? query : JSON.stringify(query);
+
+        // We need to use any type to handle the body correctly
+        const options: any = {
+          client: this.obsidianClient.client,
+          headers: { "Content-Type": contentType },
+          body: queryBody,
+        };
+
+        const response = await this.obsidianClient.sdk.postSearch(options);
+
+        return this.formatToolResponse(response);
       }
     );
 

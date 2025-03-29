@@ -9,11 +9,18 @@
       }
     }
   },
+  "ignores": [
+    "**/test/**",
+    "test/**",
+    "test/*"
+  ],
   "overrides": [
     {
       "files": [
         "**/*.test.ts",
-        "**/*.test.js"
+        "**/*.test.js",
+        "test/**/*.ts",
+        "test/*.ts"
       ],
       "rules": {
         "no-unused-vars": "off"

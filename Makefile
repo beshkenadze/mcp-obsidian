@@ -41,7 +41,7 @@ start:
 
 # Run the MCP Inspector for debugging
 debug:
-	MCP_DEBUG=true MCP_TRANSPORT=stdio npx @modelcontextprotocol/inspector bun run src/index.ts
+	MCP_DEBUG=true MCP_TRANSPORT=stdio npx @modelcontextprotocol/inspector bun --inspect run src/index.ts
 
 # Run precommit checks
 precommit:
