@@ -9,11 +9,16 @@
     "build": "bun build src/index.ts --outdir dist",
     "generate-types": "bun src/cmd/generate-types.ts",
     "test": "bun test test/index.test.ts",
-    "test:integration": "bun src/test.ts"
+    "test:all": "bun test",
+    "test:integration": "bun test test/integration/*.test.ts",
+    "lint": "oxlint --deny-warnings .",
+    "lint:fix": "oxlint --fix .",
+    "precommit": "bun run lint && bun run test"
   },
   "devDependencies": {
     "@types/bun": "^1.2.8",
     "@types/cors": "^2.8.17",
+    "oxlint": "^0.16.3",
     "typescript": "^5.8.2"
   },
   "dependencies": {

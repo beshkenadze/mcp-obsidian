@@ -73,6 +73,22 @@ The test suite includes:
 
 Note: The application automatically handles the self-signed certificate that Obsidian's Local REST API uses by disabling SSL certificate validation. This is secure for local development but should be used with caution if exposing the API to external networks.
 
+### Linting
+
+This project uses [oxlint](https://oxc.rs/docs/guide/usage/linter), a fast Rust-based JavaScript/TypeScript linter.
+
+Run the linter to check for issues:
+
+```bash
+bun run lint
+```
+
+Fix automatically fixable issues:
+
+```bash
+bun run lint:fix
+```
+
 ### Available MCP Tools
 
 The MCP server exposes the following tools:

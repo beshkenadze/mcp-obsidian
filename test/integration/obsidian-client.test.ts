@@ -1,5 +1,5 @@
 import { expect, mock, test } from "bun:test";
-import ObsidianClient from "../src/lib/obsidian-client";
+import ObsidianClient from "../../src/lib/obsidian-client";
 
 // Mock the HTTPS module before it's imported by ObsidianClient
 const mockAgent = {};
@@ -16,6 +16,7 @@ mock.module("https", () => {
 // Test group for ObsidianClient
 test("ObsidianClient", async () => {
   // Create a client with our own fetch implementation
+  /* eslint-disable-next-line no-unused-vars */
   const mockedFetch = mock((url: string, init?: any) => {
     return Promise.resolve(
       new Response(
@@ -97,9 +98,11 @@ test("ObsidianClient", async () => {
 
       const callArgs = mockedFetch.mock.calls[0];
       expect(callArgs).toBeDefined();
-      expect(callArgs.length).toBeGreaterThan(1);
-      expect(callArgs[1].method).toBe("PUT");
-      expect(callArgs[1].body).toBe(content);
+      // Use type assertion since we've verified callArgs exists
+      const args = callArgs as any[];
+      expect(args.length).toBeGreaterThan(1);
+      expect(args[1].method).toBe("PUT");
+      expect(args[1].body).toBe(content);
     });
 
     // Test listDirectory

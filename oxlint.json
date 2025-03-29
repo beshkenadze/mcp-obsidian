@@ -1,0 +1,23 @@
+{
+  "rules": {
+    "no-unused-vars": {
+      "level": "warning",
+      "options": {
+        "ignorePattern": {
+          "args": "^_"
+        }
+      }
+    }
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/*.test.ts",
+        "**/*.test.js"
+      ],
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    }
+  ]
+}
