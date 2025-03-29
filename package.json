@@ -8,7 +8,8 @@
     "start": "bun src/index.ts",
     "build": "bun build src/index.ts --outdir dist",
     "generate-types": "bun src/cmd/generate-types.ts",
-    "test": "bun src/test.ts"
+    "test": "bun test test/index.test.ts",
+    "test:integration": "bun src/test.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.2.8",

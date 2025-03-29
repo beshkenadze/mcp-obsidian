@@ -5,6 +5,7 @@ import type { paths } from "./api/types";
 export interface ObsidianClientConfig {
   baseUrl: string;
   apiKey: string;
+  fetch?: (url: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
 
 // Create a type for the response data
@@ -32,8 +33,10 @@ export class ObsidianClient {
         Authorization: `Bearer ${config.apiKey}`,
         "Content-Type": "text/markdown",
       },
-      // Use the HTTPS agent for requests
-      fetch: (url, init) => fetch(url, { ...init, agent: httpsAgent }),
+      // Use the HTTPS agent for requests or custom fetch if provided
+      fetch:
+        config.fetch ||
+        ((url, init) => fetch(url, { ...init, agent: httpsAgent })),
     });
   }
 

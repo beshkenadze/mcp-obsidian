@@ -55,11 +55,21 @@ The server will be available at `http://localhost:3000` (or the port you configu
 
 ### Testing
 
-Run the basic test suite:
+Run the unit tests:
 
 ```bash
 bun run test
 ```
+
+Run the integration tests (requires a running Obsidian instance with Local REST API):
+
+```bash
+bun run test:integration
+```
+
+The test suite includes:
+- Unit tests with mocks for the ObsidianClient and McpServer components
+- Integration tests that test the actual communication with Obsidian
 
 Note: The application automatically handles the self-signed certificate that Obsidian's Local REST API uses by disabling SSL certificate validation. This is secure for local development but should be used with caution if exposing the API to external networks.
 
