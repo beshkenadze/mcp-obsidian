@@ -60,7 +60,7 @@ info:
     When using this tool you may see browser security warnings due to your browser not trusting the self-signed certificate the plugin will generate on its first run.  If you do, you can make those errors disappear by adding the certificate as a "Trusted Certificate" in your browser or operating system's settings.
   title: "Local REST API for Obsidian"
   version: "1.0"
-openapi: "3.0.2"
+openapi: "3.1.0"
 paths:
   /:
     get:

@@ -4,6 +4,7 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 import ObsidianClient from "./lib/obsidian-client";
+import McpServer from "./mcp-server";
 
 // This is a simple test script to verify that the Obsidian client is working properly
 // It requires that you have set the OBSIDIAN_API_KEY environment variable
@@ -11,7 +12,8 @@ import ObsidianClient from "./lib/obsidian-client";
 // Get environment variables
 const OBSIDIAN_BASE_URL =
   process.env.OBSIDIAN_BASE_URL || "https://127.0.0.1:27124";
-const OBSIDIAN_API_KEY = process.env.OBSIDIAN_API_KEY;
+const OBSIDIAN_API_KEY = process.env.OBSIDIAN_API_KEY || "";
+const MCP_TEST_PORT = 3100;
 
 // Check if API key is provided
 if (!OBSIDIAN_API_KEY) {
@@ -24,6 +26,65 @@ const client = new ObsidianClient({
   baseUrl: OBSIDIAN_BASE_URL,
   apiKey: OBSIDIAN_API_KEY,
 });
+
+// Helper function to test the MCP server
+async function testMcpServer() {
+  console.log("\n--- Testing MCP Server ---");
+
+  // Initialize the MCP server
+  const mcpServer = new McpServer({
+    port: MCP_TEST_PORT,
+    obsidianBaseUrl: OBSIDIAN_BASE_URL,
+    obsidianApiKey: OBSIDIAN_API_KEY,
+  });
+
+  // Start the server
+  console.log(`Starting MCP server on port ${MCP_TEST_PORT}...`);
+  mcpServer.start();
+
+  try {
+    // Test discovery endpoint
+    console.log("Testing discovery endpoint...");
+    const discoveryResponse = await fetch(`http://localhost:${MCP_TEST_PORT}/`);
+    const discoveryData = (await discoveryResponse.json()) as {
+      server_name: string;
+      tools: Array<any>;
+    };
+    console.log(
+      "Discovery endpoint response status:",
+      discoveryResponse.status
+    );
+    console.log("Server name:", discoveryData.server_name);
+    console.log("Number of tools:", discoveryData.tools.length);
+
+    // Test a tool invocation
+    console.log("\nTesting tool invocation...");
+    const statusResponse = await fetch(
+      `http://localhost:${MCP_TEST_PORT}/tools/obsidian_get_status`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ parameters: {} }),
+      }
+    );
+    const statusData = (await statusResponse.json()) as {
+      result?: any;
+      error?: string;
+    };
+    console.log("Tool invocation status:", statusResponse.status);
+    console.log("Response contains result:", statusData.result ? "Yes" : "No");
+
+    console.log("\nMCP Server tests completed successfully!");
+  } catch (error) {
+    console.error("Error testing MCP server:", error);
+  } finally {
+    // Stop the server
+    console.log("Stopping MCP server...");
+    mcpServer.stop();
+  }
+}
 
 // Run tests
 async function runTests() {
@@ -58,6 +119,9 @@ async function runTests() {
       console.log("Commands:", commandsResult.data.commands.length);
       console.log("Sample commands:", commandsResult.data.commands.slice(0, 5));
     }
+
+    // Test MCP server
+    await testMcpServer();
 
     console.log("\nAll tests completed!");
   } catch (error) {
