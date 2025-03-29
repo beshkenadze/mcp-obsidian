@@ -11,17 +11,21 @@ A Model Context Protocol (MCP) server for interacting with Obsidian via its Loca
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/mcp-obsidian.git
+   git clone https://github.com/beshkenadze/mcp-obsidian.git
    cd mcp-obsidian
    ```
 
 2. Install dependencies:
    ```bash
+   make install
+   # or
    bun install
    ```
 
 3. Generate TypeScript types from the OpenAPI spec:
    ```bash
+   make generate-types
+   # or
    bun run generate-types
    ```
 
@@ -48,6 +52,8 @@ OBSIDIAN_API_KEY=your_api_key_here
 Start the MCP server:
 
 ```bash
+make start
+# or
 bun run start
 ```
 
@@ -58,12 +64,24 @@ The server will be available at `http://localhost:3000` (or the port you configu
 Run the unit tests:
 
 ```bash
+make test
+# or
 bun run test
 ```
 
-Run the integration tests (requires a running Obsidian instance with Local REST API):
+Run all tests including integration tests:
 
 ```bash
+make test-all
+# or
+bun run test:all
+```
+
+Run only integration tests (requires a running Obsidian instance with Local REST API):
+
+```bash
+make test-integration
+# or
 bun run test:integration
 ```
 
@@ -80,12 +98,16 @@ This project uses [oxlint](https://oxc.rs/docs/guide/usage/linter), a fast Rust-
 Run the linter to check for issues:
 
 ```bash
+make lint
+# or
 bun run lint
 ```
 
 Fix automatically fixable issues:
 
 ```bash
+make lint-fix
+# or
 bun run lint:fix
 ```
 
@@ -112,10 +134,84 @@ The MCP server exposes the following tools:
 To build a production version:
 
 ```bash
+make build
+# or
 bun run build
 ```
 
 This will create a build in the `dist` directory.
+
+## Available Makefile Commands
+
+For convenience, this project includes a Makefile with the following commands:
+
+- `make install` - Install dependencies
+- `make build` - Build the project
+- `make lint` - Run linter
+- `make lint-fix` - Run linter with autofix
+- `make test` - Run unit tests
+- `make test-all` - Run all tests
+- `make test-integration` - Run integration tests
+- `make generate-types` - Generate TypeScript types
+- `make start` - Start the application
+- `make precommit` - Run precommit checks
+- `make clean` - Clean build artifacts
+- `make act-build` - Test build GitHub Action locally
+- `make act-lint` - Test lint GitHub Action locally
+- `make act-test` - Test test GitHub Action locally
+- `make act-release-dry` - Test release GitHub Action locally (dry run)
+- `make act-release` - Test release GitHub Action locally
+- `make help` - Display help information about available commands
+
+## Using as an MCP Server
+
+This package follows the Model Context Protocol server standard and can be used with any MCP client.
+
+### Using with npx
+
+The easiest way to use this server is with npx:
+
+```bash
+npx -y @beshkenadze/mcp-obsidian
+```
+
+### Configuring in Claude Desktop
+
+To use this MCP server with Claude Desktop, add it to your Claude Desktop configuration:
+
+```json
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": ["-y", "@beshkenadze/mcp-obsidian"],
+      "env": {
+        "OBSIDIAN_API_KEY": "your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+### Configuring in Other MCP Clients
+
+Many MCP clients like Continue, Cursor, LibreChat, and others support MCP servers. Refer to your client's documentation for specific configuration details.
+
+### Installation as a Package
+
+If you want to install the package locally:
+
+```bash
+# Add to .npmrc
+@beshkenadze:registry=https://npm.pkg.github.com
+
+# Then install
+npm install @beshkenadze/mcp-obsidian
+# or
+yarn add @beshkenadze/mcp-obsidian
+# or
+bun add @beshkenadze/mcp-obsidian
+```
 
 ## Contributing
 
