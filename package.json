@@ -1,0 +1,25 @@
+{
+  "name": "mcp-obsidian",
+  "module": "index.ts",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "MCP server for Obsidian API",
+  "scripts": {
+    "start": "bun src/index.ts",
+    "build": "bun build src/index.ts --outdir dist",
+    "generate-types": "bun src/cmd/generate-types.ts",
+    "test": "bun src/test.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "openapi-fetch": "^0.13.5",
+    "openapi-typescript": "^7.6.1"
+  }
+}
