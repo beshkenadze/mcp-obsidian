@@ -8,15 +8,6 @@ export * from "./mcp-server";
 /**
  * Example usage:
  *
- * // For HTTP/SSE transport
- * const sseServer = createMcpServer({
- *   transport: "sse",
- *   port: 3000,
- *   obsidianBaseUrl: "http://localhost:27123",
- *   obsidianApiKey: "your-api-key"
- * });
- * await sseServer.start();
- *
  * // For stdio transport
  * const stdioServer = createMcpServer({
  *   transport: "stdio",
@@ -27,22 +18,23 @@ export * from "./mcp-server";
  */
 
 // Environment variables for configuration
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001;
+// The Environment variables for configuration
 const OBSIDIAN_BASE_URL =
   process.env.OBSIDIAN_BASE_URL || "https://127.0.0.1:27124";
 const OBSIDIAN_API_KEY = process.env.OBSIDIAN_API_KEY || "";
 const SERVER_TYPE = (process.env.SERVER_TYPE || "bun") as "bun" | "express";
+const MCP_DEBUG = process.env.MCP_DEBUG === "true";
 
 // Log startup configuration (but sanitize the API key)
 logger.info(
   {
-    port: PORT,
     obsidianBaseUrl: OBSIDIAN_BASE_URL,
     serverType: SERVER_TYPE,
     environment: process.env.NODE_ENV || "development",
     logLevel: process.env.LOG_LEVEL || "info",
-    transportType: process.env.MCP_TRANSPORT || "sse",
-    mcpDebug: process.env.MCP_DEBUG || false,
+    transportType: "stdio",
+    mcpDebug: MCP_DEBUG,
+    nodeVersion: process.version,
   },
   "Starting MCP server"
 );
@@ -64,43 +56,41 @@ if (!["bun", "express"].includes(SERVER_TYPE)) {
 // If this file is run directly, start an MCP server based on environment variables
 if (require.main === module) {
   (async () => {
-    const transport = process.env.MCP_TRANSPORT || "sse";
-    logger.debug({ transport }, "Setting up MCP server with transport");
+    logger.debug("Setting up MCP server with stdio transport");
 
     const baseConfig = {
-      obsidianBaseUrl:
-        process.env.OBSIDIAN_BASE_URL || "http://localhost:27123",
-      obsidianApiKey: process.env.OBSIDIAN_API_KEY || "",
-      name: process.env.MCP_SERVER_NAME,
-      version: process.env.MCP_SERVER_VERSION,
+      obsidianBaseUrl: OBSIDIAN_BASE_URL,
+      obsidianApiKey: OBSIDIAN_API_KEY,
+      name: process.env.MCP_SERVER_NAME || "Obsidian MCP Server",
+      version: process.env.MCP_SERVER_VERSION || "1.0.0",
     };
 
     logger.debug(
       {
         ...baseConfig,
-        obsidianApiKey: baseConfig.obsidianApiKey ? "***" : undefined,
+        obsidianApiKey: "***", // Redacted for security
       },
       "Base config prepared"
     );
 
     let server;
     try {
-      if (transport === "stdio") {
-        logger.debug("Creating stdio server");
-        server = createMcpServer({
-          ...baseConfig,
-          transport: "stdio",
-        });
-      } else {
-        logger.debug({ port: PORT }, "Creating SSE server");
-        server = createMcpServer({
-          ...baseConfig,
-          transport: "sse",
-          port: PORT,
-        });
-      }
+      logger.debug("Creating stdio server");
+      server = createMcpServer({
+        ...baseConfig,
+        transport: "stdio",
+      });
 
-      logger.debug("Server created successfully");
+      logger.debug(
+        {
+          serverType: "stdio",
+          serverConfig: {
+            ...baseConfig,
+            obsidianApiKey: "***", // Redacted for security
+          },
+        },
+        "Server created successfully"
+      );
     } catch (error) {
       logger.error(
         { error, stack: (error as Error).stack },
@@ -125,7 +115,7 @@ if (require.main === module) {
     try {
       logger.debug("Starting server");
       await server.start();
-      logger.info("Server started successfully");
+      logger.info("STDIO server started successfully");
     } catch (error) {
       logger.error(
         { error, stack: (error as Error).stack },

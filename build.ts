@@ -28,11 +28,7 @@ reportBuildResult(mainBuild, "Main bundle");
 console.log("📦 Building server modules...");
 const serverBuild = await build({
   ...commonConfig,
-  entrypoints: [
-    "./src/mcp-server.ts",
-    "./src/mcp-sse-server.ts",
-    "./src/mcp-stdio-server.ts",
-  ],
+  entrypoints: ["./src/mcp-server.ts", "./src/mcp-stdio-server.ts"],
 });
 reportBuildResult(serverBuild, "Server modules");
 

@@ -44,7 +44,7 @@ debug:
 	MCP_DEBUG=true MCP_TRANSPORT=stdio npx @modelcontextprotocol/inspector bun --inspect run src/index.ts
 	
 debug-sse:
-	MCP_DEBUG=true MCP_TRANSPORT=sse npx @modelcontextprotocol/inspector bun --inspect run src/index.ts
+	MCP_DEBUG=true MCP_TRANSPORT=sse npx @modelcontextprotocol/inspector
 
 # Directly run SSE server without inspector
 run-sse:
