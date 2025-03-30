@@ -1,4 +1,4 @@
-.PHONY: install build lint test test-all test-integration start clean help act-build act-lint act-test act-release debug
+.PHONY: install build lint test test-all test-integration start clean help act-build act-lint act-test act-release debug start-supergateway
 
 # Default target
 all: install build lint test
@@ -98,4 +98,8 @@ help:
 	@echo "  act-release-dry  - Test release GitHub Action locally (dry run)"
 	@echo "  act-release      - Test release GitHub Action locally"
 	@echo "  all              - Run install, build, lint, and test (default)"
-	@echo "  help             - Show this help message" 
+	@echo "  help             - Show this help message"
+	@echo "  start-supergateway - Start the application with supergateway for SSE"
+
+start-supergateway: ## Start the application with supergateway for SSE
+	bun run start:supergateway 

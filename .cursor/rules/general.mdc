@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# General project
+
+## Environment
+- Always use BUN instead of NPM for package management
+- Do not use NPM commands; use BUN equivalents
+
+## Version Control
+- Generate a descriptive commit message after each successfully completed task
+- Ensure commit messages clearly explain what changes were made
+- Include reference to task/issue number in commit messages when applicable

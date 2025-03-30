@@ -154,6 +154,90 @@ The MCP server exposes the following tools:
 - `obsidian_list_commands`: List available commands in Obsidian
 - `obsidian_execute_command`: Execute a command in Obsidian
 
+## Running with SSE Support
+
+This MCP server supports Server-Sent Events (SSE) for real-time communication with web clients. There are two ways to run the server with SSE support:
+
+### 1. Using Built-in SSE Mode
+
+Run the server with the SSE transport:
+
+```bash
+make start-sse
+# or
+bun run start:sse
+```
+
+This uses the built-in SSE implementation and listens on the configured port.
+
+### 2. Using Supergateway (Recommended)
+
+[Supergateway](https://github.com/supercorp-ai/supergateway) allows running stdio MCP servers over SSE or WebSockets with additional features. To use Supergateway:
+
+```bash
+make start-supergateway
+# or
+bun run start:supergateway
+```
+
+This starts the MCP server with Supergateway, providing:
+
+- SSE endpoint at: `http://localhost:3001/sse`
+- Message endpoint at: `http://localhost:3001/message`
+- CORS support for cross-origin requests
+- Improved compatibility with various MCP clients
+
+#### Client Example
+
+Connect to the MCP server using SSE with a web client:
+
+```javascript
+// Connect to the SSE endpoint
+const eventSource = new EventSource('http://localhost:3001/sse');
+
+// Listen for messages
+eventSource.onmessage = (event) => {
+  const message = JSON.parse(event.data);
+  console.log('Received message:', message);
+};
+
+// Send a message to the server
+async function sendMessage(message) {
+  await fetch('http://localhost:3001/message', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(message),
+  });
+}
+
+// Example: List files in the vault
+sendMessage({
+  jsonrpc: '2.0',
+  id: '1',
+  method: 'invoke',
+  params: {
+    name: 'obsidian_list_files',
+    parameters: {
+      path: ''
+    }
+  }
+});
+```
+
+#### Using with MCP Inspector
+
+You can use [MCP Inspector](https://github.com/ModelContextProtocol/inspector) to test the MCP server:
+
+```bash
+# In one terminal
+bun run start:supergateway
+
+# In another terminal
+npx @modelcontextprotocol/inspector http://localhost:3001
+```
+
 ## Building for Production
 
 To build a production version:
