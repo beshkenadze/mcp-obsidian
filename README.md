@@ -144,12 +144,21 @@ The MCP server exposes the following tools:
 - `obsidian_get_active_file`: Get content of the currently active file in Obsidian
 - `obsidian_update_active_file`: Update the content of the currently active file in Obsidian
 - `obsidian_append_to_active_file`: Append content to the currently active file in Obsidian
+- `obsidian_patch_active_file`: Modify the active file relative to headings, blocks, or frontmatter
+- `obsidian_delete_active_file`: Delete the currently active file in Obsidian
 - `obsidian_list_files`: List files in a directory
 - `obsidian_get_file`: Get content of a file
 - `obsidian_create_or_update_file`: Create a new file or update an existing one
 - `obsidian_append_to_file`: Append content to a file
+- `obsidian_patch_file`: Modify a file relative to headings, blocks, or frontmatter
 - `obsidian_delete_file`: Delete a file
-- `obsidian_search`: Search for content in vault
+- `obsidian_get_periodic_note`: Get current periodic note for the specified period
+- `obsidian_update_periodic_note`: Update the content of a periodic note
+- `obsidian_append_to_periodic_note`: Append content to a periodic note
+- `obsidian_delete_periodic_note`: Delete a periodic note
+- `obsidian_patch_periodic_note`: Modify a periodic note relative to headings, blocks, or frontmatter
+- `obsidian_search`: Search for content in vault with simple text queries
+- `obsidian_advanced_search`: Advanced search using JsonLogic or Dataview queries
 - `obsidian_open_document`: Open a document in Obsidian
 - `obsidian_list_commands`: List available commands in Obsidian
 - `obsidian_execute_command`: Execute a command in Obsidian
