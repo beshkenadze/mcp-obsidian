@@ -42,6 +42,13 @@ start:
 # Run the MCP Inspector for debugging
 debug:
 	MCP_DEBUG=true MCP_TRANSPORT=stdio npx @modelcontextprotocol/inspector bun --inspect run src/index.ts
+	
+debug-sse:
+	MCP_DEBUG=true MCP_TRANSPORT=sse npx @modelcontextprotocol/inspector bun --inspect run src/index.ts
+
+# Directly run SSE server without inspector
+run-sse:
+	MCP_TRANSPORT=sse LOG_LEVEL=trace LOG_TO_CONSOLE=true bun run src/index.ts
 
 # Run precommit checks
 precommit:

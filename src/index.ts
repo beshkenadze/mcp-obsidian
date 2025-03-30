@@ -27,7 +27,7 @@ export * from "./mcp-server";
  */
 
 // Environment variables for configuration
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3003;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 const OBSIDIAN_BASE_URL =
   process.env.OBSIDIAN_BASE_URL || "https://127.0.0.1:27124";
 const OBSIDIAN_API_KEY = process.env.OBSIDIAN_API_KEY || "";
@@ -40,6 +40,9 @@ logger.info(
     obsidianBaseUrl: OBSIDIAN_BASE_URL,
     serverType: SERVER_TYPE,
     environment: process.env.NODE_ENV || "development",
+    logLevel: process.env.LOG_LEVEL || "info",
+    transportType: process.env.MCP_TRANSPORT || "sse",
+    mcpDebug: process.env.MCP_DEBUG || false,
   },
   "Starting MCP server"
 );
@@ -62,6 +65,8 @@ if (!["bun", "express"].includes(SERVER_TYPE)) {
 if (require.main === module) {
   (async () => {
     const transport = process.env.MCP_TRANSPORT || "sse";
+    logger.debug({ transport }, "Setting up MCP server with transport");
+
     const baseConfig = {
       obsidianBaseUrl:
         process.env.OBSIDIAN_BASE_URL || "http://localhost:27123",
@@ -70,32 +75,64 @@ if (require.main === module) {
       version: process.env.MCP_SERVER_VERSION,
     };
 
+    logger.debug(
+      {
+        ...baseConfig,
+        obsidianApiKey: baseConfig.obsidianApiKey ? "***" : undefined,
+      },
+      "Base config prepared"
+    );
+
     let server;
-    if (transport === "stdio") {
-      server = createMcpServer({
-        ...baseConfig,
-        transport: "stdio",
-      });
-    } else {
-      server = createMcpServer({
-        ...baseConfig,
-        transport: "sse",
-        port: parseInt(process.env.MCP_PORT || "3000", 10),
-      });
+    try {
+      if (transport === "stdio") {
+        logger.debug("Creating stdio server");
+        server = createMcpServer({
+          ...baseConfig,
+          transport: "stdio",
+        });
+      } else {
+        logger.debug({ port: PORT }, "Creating SSE server");
+        server = createMcpServer({
+          ...baseConfig,
+          transport: "sse",
+          port: PORT,
+        });
+      }
+
+      logger.debug("Server created successfully");
+    } catch (error) {
+      logger.error(
+        { error, stack: (error as Error).stack },
+        "Failed to create MCP server"
+      );
+      process.exit(1);
     }
 
     // Handle termination signals
     process.on("SIGINT", () => {
+      logger.info("Received SIGINT, shutting down");
       server.stop();
       process.exit(0);
     });
 
     process.on("SIGTERM", () => {
+      logger.info("Received SIGTERM, shutting down");
       server.stop();
       process.exit(0);
     });
 
-    await server.start();
+    try {
+      logger.debug("Starting server");
+      await server.start();
+      logger.info("Server started successfully");
+    } catch (error) {
+      logger.error(
+        { error, stack: (error as Error).stack },
+        "Error starting MCP server"
+      );
+      process.exit(1);
+    }
   })().catch((err) => {
     console.error("Error starting MCP server:", err);
     process.exit(1);

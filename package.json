@@ -6,6 +6,7 @@
   "description": "MCP server for Obsidian API",
   "scripts": {
     "start": "bun src/index.ts",
+    "start:sse": "MCP_TRANSPORT=sse LOG_TO_CONSOLE=true bun src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target node",
     "start:node": "node dist/index.js",
     "generate-types": "bun src/cmd/generate-types.ts",
