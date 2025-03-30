@@ -1,0 +1,51 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+dist
+build
+out
+
+# Docker files
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Version control
+.git
+.gitignore
+.github
+
+# Environment files
+.env
+.env.*
+.envrc
+
+# IDE files
+.vscode
+.idea
+*.sublime-*
+.editorconfig
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun-debug.log*
+
+# Testing
+coverage
+.nyc_output
+test-results
+
+# Misc
+.DS_Store
+README.md
+LICENSE
+Makefile
+*.md
+*.txt 

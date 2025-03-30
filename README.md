@@ -47,6 +47,88 @@ OBSIDIAN_API_KEY=your_api_key_here
 SERVER_TYPE=bun  # Options: bun, express
 ```
 
+## Docker Support
+
+You can run the MCP Obsidian server using Docker with different transport modes.
+
+### Building the Docker Image
+
+Build the Docker image using the provided Dockerfile:
+
+```bash
+docker build -t mcp-obsidian .
+```
+
+### Running with Docker
+
+Run the Docker container with the appropriate environment variables:
+
+```bash
+docker run -p 3000:3000 \
+  -e OBSIDIAN_API_KEY=your_api_key_here \
+  -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+  mcp-obsidian
+```
+
+Note: Use `host.docker.internal` instead of `127.0.0.1` to access Obsidian running on your host machine from within the Docker container.
+
+#### Available Transport Modes
+
+The Docker image supports different transport modes:
+
+##### 1. HTTP Mode (Default)
+
+The default mode serves the MCP server over HTTP:
+
+```bash
+docker run -p 3000:3000 \
+  -e OBSIDIAN_API_KEY=your_api_key_here \
+  -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+  mcp-obsidian
+```
+
+##### 2. SSE Mode
+
+To run with SSE transport:
+
+```bash
+docker run -p 3000:3000 \
+  -e OBSIDIAN_API_KEY=your_api_key_here \
+  -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+  -e TRANSPORT_TYPE=sse \
+  mcp-obsidian
+```
+
+##### 3. stdio Mode
+
+To run with stdio transport (useful for integration with other MCP clients):
+
+```bash
+docker run -i \
+  -e OBSIDIAN_API_KEY=your_api_key_here \
+  -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+  -e TRANSPORT_TYPE=stdio \
+  mcp-obsidian
+```
+
+Note: When using stdio mode, you must run the container with the `-i` flag to enable interactive mode.
+
+### Using Docker with Supergateway
+
+To use the Docker container with Supergateway:
+
+```bash
+# Run the MCP server with stdio transport
+docker run -i \
+  -e OBSIDIAN_API_KEY=your_api_key_here \
+  -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+  -e TRANSPORT_TYPE=stdio \
+  mcp-obsidian | \
+npx -y @supercorp/supergateway
+```
+
+This pipes the stdio output from the Docker container to Supergateway.
+
 ## Usage
 
 ### Running the MCP Server
@@ -165,7 +247,7 @@ The MCP server exposes the following tools:
 
 ## Running with SSE Support
 
-This MCP server supports Server-Sent Events (SSE) for real-time communication with web clients. There are two ways to run the server with SSE support:
+This MCP server supports Server-Sent Events (SSE) for real-time communication with web clients. There are multiple ways to run the server with SSE support:
 
 ### 1. Using Built-in SSE Mode
 
@@ -175,18 +257,30 @@ Run the server with the SSE transport:
 make start-sse
 # or
 bun run start:sse
+# or with Docker
+docker run -p 3000:3000 \
+  -e OBSIDIAN_API_KEY=your_api_key_here \
+  -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+  -e TRANSPORT_TYPE=sse \
+  mcp-obsidian
 ```
 
 This uses the built-in SSE implementation and listens on the configured port.
 
-### 2. Using Supergateway (Recommended)
+### 2. Using Supergateway
 
 [Supergateway](https://github.com/supercorp-ai/supergateway) allows running stdio MCP servers over SSE or WebSockets with additional features. To use Supergateway:
 
 ```bash
-make start-supergateway
-# or
-bun run start:supergateway
+# Run with stdio and pipe to Supergateway
+bun run start:stdio | npx -y @supercorp/supergateway
+# or with Docker
+docker run -i \
+  -e OBSIDIAN_API_KEY=your_api_key_here \
+  -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+  -e TRANSPORT_TYPE=stdio \
+  mcp-obsidian | \
+npx -y @supercorp/supergateway
 ```
 
 This starts the MCP server with Supergateway, providing:
@@ -272,8 +366,14 @@ For convenience, this project includes a Makefile with the following commands:
 - `make test-integration` - Run integration tests
 - `make generate-types` - Generate TypeScript types
 - `make start` - Start the application
+- `make start-sse` - Start the application with SSE transport
 - `make precommit` - Run precommit checks
 - `make clean` - Clean build artifacts
+- `make docker-build` - Build Docker image
+- `make docker-run` - Run Docker container (HTTP mode)
+- `make docker-run-sse` - Run Docker container with SSE transport
+- `make docker-run-stdio` - Run Docker container with stdio transport
+- `make docker-run-supergateway` - Run Docker container with supergateway
 - `make act-build` - Test build GitHub Action locally
 - `make act-lint` - Test lint GitHub Action locally
 - `make act-test` - Test test GitHub Action locally
@@ -293,6 +393,18 @@ The easiest way to use this server is with npx:
 npx -y @beshkenadze/mcp-obsidian
 ```
 
+### Using with Docker
+
+You can also run the MCP server as a Docker container:
+
+```bash
+docker run -i \
+  -e OBSIDIAN_API_KEY=your_api_key_here \
+  -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+  -e TRANSPORT_TYPE=stdio \
+  beshkenadze/mcp-obsidian
+```
+
 ### Configuring in Claude Desktop
 
 To use this MCP server with Claude Desktop, add it to your Claude Desktop configuration:
@@ -306,6 +418,20 @@ To use this MCP server with Claude Desktop, add it to your Claude Desktop config
       "env": {
         "OBSIDIAN_API_KEY": "your_api_key_here"
       }
+    }
+  }
+}
+```
+
+You can also use Docker with Claude Desktop:
+
+```json
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "docker",
+      "args": ["run", "-i", "-e", "OBSIDIAN_API_KEY=your_api_key_here", "-e", "OBSIDIAN_BASE_URL=https://host.docker.internal:27124", "-e", "TRANSPORT_TYPE=stdio", "beshkenadze/mcp-obsidian"],
+      "env": {}
     }
   }
 }

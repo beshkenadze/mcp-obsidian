@@ -1,4 +1,4 @@
-.PHONY: install build lint test test-all test-integration start clean help act-build act-lint act-test act-release debug start-supergateway
+.PHONY: install build lint test test-all test-integration start start-sse clean help act-build act-lint act-test act-release debug docker-build docker-run docker-run-sse docker-run-stdio docker-run-supergateway
 
 # Default target
 all: install build lint test
@@ -38,6 +38,10 @@ generate-types:
 # Start the application
 start:
 	bun start
+
+# Start the application with SSE transport
+start-sse:
+	bun run start:sse
 
 # Run the MCP Inspector for debugging
 debug:
@@ -89,6 +93,7 @@ help:
 	@echo "  test-integration - Run integration tests"
 	@echo "  generate-types   - Generate TypeScript types"
 	@echo "  start            - Start the application"
+	@echo "  start-sse        - Start the application with SSE transport"
 	@echo "  debug            - Run MCP Inspector for debugging"
 	@echo "  precommit        - Run precommit checks"
 	@echo "  clean            - Clean build artifacts"
@@ -99,7 +104,40 @@ help:
 	@echo "  act-release      - Test release GitHub Action locally"
 	@echo "  all              - Run install, build, lint, and test (default)"
 	@echo "  help             - Show this help message"
-	@echo "  start-supergateway - Start the application with supergateway for SSE"
+	@echo "  docker-build     - Build Docker image"
+	@echo "  docker-run       - Run Docker container"
+	@echo "  docker-run-sse   - Run Docker container with SSE transport"
+	@echo "  docker-run-stdio - Run Docker container with stdio transport"
+	@echo "  docker-run-supergateway - Run Docker container with supergateway"
 
-start-supergateway: ## Start the application with supergateway for SSE
-	bun run start:supergateway 
+# Docker commands
+docker-build:
+	docker build -t mcp-obsidian .
+
+docker-run:
+	docker run -p 3000:3000 \
+		-e OBSIDIAN_API_KEY=${OBSIDIAN_API_KEY} \
+		-e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+		mcp-obsidian
+
+docker-run-sse:
+	docker run -p 3000:3000 \
+		-e OBSIDIAN_API_KEY=${OBSIDIAN_API_KEY} \
+		-e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+		-e TRANSPORT_TYPE=sse \
+		mcp-obsidian
+
+docker-run-stdio:
+	docker run -i \
+		-e OBSIDIAN_API_KEY=${OBSIDIAN_API_KEY} \
+		-e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+		-e TRANSPORT_TYPE=stdio \
+		mcp-obsidian
+
+docker-run-supergateway:
+	docker run -i \
+		-e OBSIDIAN_API_KEY=${OBSIDIAN_API_KEY} \
+		-e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
+		-e TRANSPORT_TYPE=stdio \
+		mcp-obsidian | \
+	npx -y @supercorp/supergateway 

@@ -7,6 +7,7 @@
   "scripts": {
     "start": "bun src/index.ts",
     "start:sse": "MCP_TRANSPORT=sse LOG_TO_CONSOLE=true bun src/index.ts",
+    "start:stdio": "MCP_TRANSPORT=stdio LOG_TO_CONSOLE=true bun src/index.ts",
     "start:supergateway": "bun run src/bin/run-with-supergateway.ts",
     "build": "bun build src/index.ts --outdir dist --target node",
     "start:node": "node dist/index.js",
