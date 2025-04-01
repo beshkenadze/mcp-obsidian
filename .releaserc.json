@@ -13,17 +13,9 @@
       }
     ],
     [
-      "@semantic-release/exec",
-      {
-        "publishCmd": "echo \"@${process.env.GITHUB_REPOSITORY_OWNER}:registry=https://npm.pkg.github.com\" > .npmrc && echo \"//npm.pkg.github.com/:_authToken=${process.env.GITHUB_TOKEN}\" >> .npmrc && npm publish --registry=https://npm.pkg.github.com"
-      }
-    ],
-    [
       "@semantic-release/github",
       {
-        "assets": [
-          "dist/*.tgz"
-        ]
+        "assets": []
       }
     ],
     [
