@@ -1,8 +1,8 @@
 import {
   ObsidianSseServer,
   type ObsidianSseServerConfig,
-} from "./servers/mcp-sse-server";
-import { ObsidianStdioServer } from "./servers/mcp-stdio-server";
+} from "./mcp-sse-server";
+import { ObsidianStdioServer } from "./mcp-stdio-server";
 
 export { ObsidianSseServer, ObsidianStdioServer };
 export type { ObsidianSseServerConfig };

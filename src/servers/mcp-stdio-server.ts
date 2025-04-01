@@ -1,7 +1,7 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import type { McpServerConfig } from "./lib/common-server";
-import { CommonMcpServer } from "./lib/common-server";
-import logger from "./lib/logger";
+import type { McpServerConfig } from "../lib/common-server";
+import { CommonMcpServer } from "../lib/common-server";
+import logger from "../lib/logger";
 
 export class ObsidianStdioServer extends CommonMcpServer {
   private transport: StdioServerTransport | null = null;

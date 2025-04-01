@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
-import { ObsidianStdioServer } from "../src/mcp-server";
+import { ObsidianStdioServer } from "../src/servers/mcp-server";
 
 // Mock the ObsidianClient class
 mock.module("../src/lib/obsidian-client", () => {

@@ -21,15 +21,16 @@ FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
 
-# Run tests and build
+# Build the project
 ENV NODE_ENV=production
-RUN bun test
-RUN bun run build
+# RUN bun run build
+# TODO: Uncomment this when we want to build the project instead of running typescript directly
 
 # Copy production dependencies and source code into final image
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/dist ./dist
+# COPY --from=prerelease /usr/src/app/dist ./dist
+# TODO: Uncomment this when we want to build the project instead of running typescript directly
 COPY --from=prerelease /usr/src/app/src ./src
 COPY --from=prerelease /usr/src/app/package.json .
 

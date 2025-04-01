@@ -11,6 +11,6 @@ alwaysApply: true
 - Do not use NPM commands; use BUN equivalents
 
 ## Version Control
-- Generate a descriptive commit message after each successfully completed task
-- Ensure commit messages clearly explain what changes were made
-- Include reference to task/issue number in commit messages when applicable
+- Generate a descriptive text commit message after each successfully completed task
+- Ensure text commit messages clearly explain what changes were made
+- Include reference to task/issue number in text commit messages when applicable

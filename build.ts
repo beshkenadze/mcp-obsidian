@@ -13,7 +13,12 @@ const commonConfig: BuildConfig = {
   format: "esm",
   minify: process.env.NODE_ENV === "production",
   sourcemap: process.env.NODE_ENV !== "production" ? "external" : "none",
-  external: ["@modelcontextprotocol/sdk", "express", "zod"],
+  external: [
+    "@modelcontextprotocol/sdk",
+    "zod",
+    "@hey-api/client-fetch",
+    "pino",
+  ],
 };
 
 // Build the main entry point that exports everything

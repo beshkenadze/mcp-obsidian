@@ -4,7 +4,7 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 import ObsidianClient from "./lib/obsidian-client";
-import McpServer from "./mcp-server";
+import McpServer from "./servers/mcp-server";
 
 // This is a simple test script to verify that the Obsidian client is working properly
 // It requires that you have set the OBSIDIAN_API_KEY environment variable
