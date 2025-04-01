@@ -1,9 +1,16 @@
 {
-  "name": "mcp-obsidian",
+  "name": "@beshkenadze/mcp-obsidian",
   "module": "index.ts",
   "type": "module",
   "version": "1.0.0",
   "description": "MCP server for Obsidian API",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beshkenadze/mcp-obsidian.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "start": "bun src/index.ts",
     "start:sse": "MCP_TRANSPORT=sse LOG_TO_CONSOLE=true bun src/index.ts",

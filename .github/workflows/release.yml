@@ -59,6 +59,11 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
       
+      - name: Setup .npmrc for GitHub Packages
+        run: |
+          echo "@${{ github.repository_owner }}:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
+      
       - name: Set version from release
         if: github.event_name == 'release'
         run: echo "NEW_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
@@ -79,13 +84,13 @@ jobs:
       
       - name: Publish to GitHub Packages
         if: ${{ github.event.inputs.dry-run == 'false' || github.event_name == 'release' }}
-        run: npm publish --access=public
+        run: bun publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Dry run (no publish)
         if: ${{ github.event.inputs.dry-run == 'true' && github.event_name == 'workflow_dispatch' }}
-        run: npm publish --dry-run --access=public
+        run: bun publish --dry-run --access=public
       
       - name: Push changes
         if: ${{ (github.event.inputs.dry-run == 'false' && github.event_name == 'workflow_dispatch') }}
