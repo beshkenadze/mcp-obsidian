@@ -1,6 +1,10 @@
 name: Release
 
 on:
+  push:
+    branches:
+      - main
+      - master
   workflow_dispatch:
     inputs:
       dry-run:
@@ -32,6 +36,9 @@ jobs:
       - name: Install dependencies
         run: bun install
       
+      - name: Install semantic-release dependencies
+        run: bun add -d semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/npm @semantic-release/exec @semantic-release/github @semantic-release/git
+      
       - name: Run linter
         run: bun run lint
       
@@ -48,7 +55,7 @@ jobs:
           DRY_RUN: ${{ github.event.inputs.dry-run == 'true' && 'true' || 'false' }}
         run: |
           if [ "$DRY_RUN" = "true" ]; then
-            npx semantic-release --dry-run
+            npx semantic-release --dry-run --debug
           else
-            npx semantic-release
+            npx semantic-release --debug
           fi 
