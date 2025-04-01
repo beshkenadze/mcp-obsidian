@@ -1,10 +1,6 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
-      - master
   workflow_dispatch:
     inputs:
       dry-run:
@@ -51,4 +47,8 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           DRY_RUN: ${{ github.event.inputs.dry-run == 'true' && 'true' || 'false' }}
         run: |
-          npx semantic-release${DRY_RUN == 'true' && ' --dry-run' || ''} 
+          if [ "$DRY_RUN" = "true" ]; then
+            npx semantic-release --dry-run
+          else
+            npx semantic-release
+          fi 
