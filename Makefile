@@ -135,9 +135,8 @@ docker-run-stdio:
 		mcp-obsidian
 
 docker-run-supergateway:
-	docker run -i \
+	docker run -p 3000:3000 \
 		-e OBSIDIAN_API_KEY=${OBSIDIAN_API_KEY} \
 		-e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
-		-e TRANSPORT_TYPE=stdio \
-		mcp-obsidian | \
-	npx -y @supercorp/supergateway 
+		-e TRANSPORT_TYPE=sse \
+		mcp-obsidian 

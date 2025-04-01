@@ -265,81 +265,30 @@ docker run -p 3000:3000 \
   mcp-obsidian
 ```
 
-This uses the built-in SSE implementation and listens on the configured port.
+This uses [Supergateway](https://github.com/supercorp-ai/supergateway) for SSE implementation and listens on the configured port.
 
-### 2. Using Supergateway
+### 2. Using Supergateway Directly
 
-[Supergateway](https://github.com/supercorp-ai/supergateway) allows running stdio MCP servers over SSE or WebSockets with additional features. To use Supergateway:
+You can also run the server with the dedicated supergateway script:
 
 ```bash
-# Run with stdio and pipe to Supergateway
-bun run start:stdio | npx -y @supercorp/supergateway
+# Run with supergateway
+bun run start:supergateway
 # or with Docker
-docker run -i \
+docker run -p 3000:3000 \
   -e OBSIDIAN_API_KEY=your_api_key_here \
   -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
   -e TRANSPORT_TYPE=stdio \
-  mcp-obsidian | \
-npx -y @supercorp/supergateway
+  mcp-obsidian
 ```
 
-This starts the MCP server with Supergateway, providing:
+Both options provide:
 
-- SSE endpoint at: `http://localhost:3001/sse`
-- Message endpoint at: `http://localhost:3001/message`
+- SSE endpoint at: `http://localhost:3000/sse`
+- Message endpoint at: `http://localhost:3000/message`
 - CORS support for cross-origin requests
+- Health endpoint at: `http://localhost:3000/healthz`
 - Improved compatibility with various MCP clients
-
-#### Client Example
-
-Connect to the MCP server using SSE with a web client:
-
-```javascript
-// Connect to the SSE endpoint
-const eventSource = new EventSource('http://localhost:3001/sse');
-
-// Listen for messages
-eventSource.onmessage = (event) => {
-  const message = JSON.parse(event.data);
-  console.log('Received message:', message);
-};
-
-// Send a message to the server
-async function sendMessage(message) {
-  await fetch('http://localhost:3001/message', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
-}
-
-// Example: List files in the vault
-sendMessage({
-  jsonrpc: '2.0',
-  id: '1',
-  method: 'invoke',
-  params: {
-    name: 'obsidian_list_files',
-    parameters: {
-      path: ''
-    }
-  }
-});
-```
-
-#### Using with MCP Inspector
-
-You can use [MCP Inspector](https://github.com/ModelContextProtocol/inspector) to test the MCP server:
-
-```bash
-# In one terminal
-bun run start:supergateway
-
-# In another terminal
-npx @modelcontextprotocol/inspector http://localhost:3001
-```
 
 ## Building for Production
 
