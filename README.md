@@ -29,6 +29,56 @@ A Model Context Protocol (MCP) server for interacting with Obsidian via its Loca
    bun run generate-types
    ```
 
+### Installing as a Package
+
+You can install the package directly from npm:
+
+```bash
+# Install from npm (no authentication required)
+npm install @beshkenadze/mcp-obsidian
+# or
+yarn add @beshkenadze/mcp-obsidian
+# or
+bun add @beshkenadze/mcp-obsidian
+```
+
+Alternatively, you can install from GitHub Packages (requires GitHub authentication):
+
+```bash
+# Add to .npmrc
+@beshkenadze:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+
+# Then install
+npm install @beshkenadze/mcp-obsidian
+# or
+yarn add @beshkenadze/mcp-obsidian
+# or
+bun add @beshkenadze/mcp-obsidian
+```
+
+## Development
+
+### Release Process
+
+This project uses [semantic-release](https://semantic-release.gitbook.io/semantic-release/) to automate version management and package publishing. The workflow:
+
+1. Commits must follow the [Conventional Commits](https://www.conventionalcommits.org/) format
+   - `feat: add new feature` - triggers a minor release
+   - `fix: resolve bug` - triggers a patch release
+   - `feat!:` or `fix!:` or `refactor!:` etc. - triggers a major release
+   - `chore:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:` - no release triggered
+
+2. When commits are pushed to the main branch, the release workflow:
+   - Determines the next version number based on commit messages
+   - Updates package.json with the new version
+   - Generates release notes from commits
+   - Creates a GitHub release with the notes
+   - Publishes to both npm Registry and GitHub Packages
+   - Updates the repository with version changes
+
+You can also manually trigger a release using the GitHub Actions workflow dispatch.
+
 ## Configuration
 
 The MCP server is configured using environment variables:
@@ -67,7 +117,7 @@ Run the Docker container with the appropriate environment variables:
 docker run -p 3000:3000 \
   -e OBSIDIAN_API_KEY=your_api_key_here \
   -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
-  mcp-obsidian
+  beshkenadze/mcp-obsidian
 ```
 
 Note: Use `host.docker.internal` instead of `127.0.0.1` to access Obsidian running on your host machine from within the Docker container.
@@ -84,7 +134,7 @@ The default mode serves the MCP server over HTTP:
 docker run -p 3000:3000 \
   -e OBSIDIAN_API_KEY=your_api_key_here \
   -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
-  mcp-obsidian
+  beshkenadze/mcp-obsidian
 ```
 
 ##### 2. SSE Mode
@@ -96,7 +146,7 @@ docker run -p 3000:3000 \
   -e OBSIDIAN_API_KEY=your_api_key_here \
   -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
   -e TRANSPORT_TYPE=sse \
-  mcp-obsidian
+  beshkenadze/mcp-obsidian
 ```
 
 ##### 3. stdio Mode
@@ -108,7 +158,7 @@ docker run -i \
   -e OBSIDIAN_API_KEY=your_api_key_here \
   -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
   -e TRANSPORT_TYPE=stdio \
-  mcp-obsidian
+  beshkenadze/mcp-obsidian
 ```
 
 Note: When using stdio mode, you must run the container with the `-i` flag to enable interactive mode.
@@ -118,12 +168,15 @@ Note: When using stdio mode, you must run the container with the `-i` flag to en
 To use the Docker container with Supergateway:
 
 ```bash
+# Pull the public Docker image (no authentication required)
+docker pull beshkenadze/mcp-obsidian
+
 # Run the MCP server with stdio transport
 docker run -i \
   -e OBSIDIAN_API_KEY=your_api_key_here \
   -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
   -e TRANSPORT_TYPE=stdio \
-  mcp-obsidian | \
+  beshkenadze/mcp-obsidian | \
 npx -y @supercorp/supergateway
 ```
 
@@ -262,7 +315,7 @@ docker run -p 3000:3000 \
   -e OBSIDIAN_API_KEY=your_api_key_here \
   -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
   -e TRANSPORT_TYPE=sse \
-  mcp-obsidian
+  beshkenadze/mcp-obsidian
 ```
 
 This uses [Supergateway](https://github.com/supercorp-ai/supergateway) for SSE implementation and listens on the configured port.
@@ -279,7 +332,7 @@ docker run -p 3000:3000 \
   -e OBSIDIAN_API_KEY=your_api_key_here \
   -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
   -e TRANSPORT_TYPE=stdio \
-  mcp-obsidian
+  beshkenadze/mcp-obsidian
 ```
 
 Both options provide:
@@ -334,19 +387,23 @@ For convenience, this project includes a Makefile with the following commands:
 
 This package follows the Model Context Protocol server standard and can be used with any MCP client.
 
-### Using with npx
+### Using with npx (npm Registry - No Authentication Required)
 
-The easiest way to use this server is with npx:
+You can use this package directly from npm without authentication:
 
 ```bash
-npx -y @beshkenadze/mcp-obsidian
+npx @beshkenadze/mcp-obsidian
 ```
 
-### Using with Docker
+### Using with Docker (Recommended for Anonymous Access)
 
-You can also run the MCP server as a Docker container:
+The recommended way to use this MCP server without authentication is via Docker:
 
 ```bash
+# Pull the public Docker image (no authentication required)
+docker pull beshkenadze/mcp-obsidian
+
+# Run with stdio transport for MCP client integration
 docker run -i \
   -e OBSIDIAN_API_KEY=your_api_key_here \
   -e OBSIDIAN_BASE_URL=https://host.docker.internal:27124 \
@@ -354,33 +411,76 @@ docker run -i \
   beshkenadze/mcp-obsidian
 ```
 
+This method requires no GitHub authentication and works out of the box with any MCP client.
+
+### Setting Up Anonymous Access
+
+To use this MCP server anonymously:
+
+1. **Use npm directly**: The package is available on the npm registry without authentication requirements.
+2. **Use the Docker approach**: The Docker image is publicly available without authentication requirements.
+3. No GitHub tokens or authentication needed.
+4. The only authentication you'll need is your Obsidian API key, which is for Obsidian access, not package access.
+
+### Using with npx (GitHub Packages - Requires Authentication)
+
+Since this package is also hosted on GitHub's package registry, you can use it from there with authentication:
+
+1. Create or update your `~/.npmrc` file with your GitHub authentication:
+   ```bash
+   @beshkenadze:registry=https://npm.pkg.github.com
+   //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+   ```
+   
+   You'll need a GitHub personal access token with the `read:packages` scope.
+
+2. Then run:
+   ```bash
+   npx @beshkenadze/mcp-obsidian
+   ```
+
 ### Configuring in Claude Desktop
 
 To use this MCP server with Claude Desktop, add it to your Claude Desktop configuration:
 
-```json
-{
-  "mcpServers": {
-    "obsidian": {
-      "command": "npx",
-      "args": ["-y", "@beshkenadze/mcp-obsidian"],
-      "env": {
-        "OBSIDIAN_API_KEY": "your_api_key_here"
-      }
-    }
-  }
-}
-```
+#### Option 1: Using Docker (Recommended for Anonymous Access)
 
-You can also use Docker with Claude Desktop:
+This method doesn't require GitHub authentication:
 
 ```json
 {
   "mcpServers": {
     "obsidian": {
       "command": "docker",
-      "args": ["run", "-i", "-e", "OBSIDIAN_API_KEY=your_api_key_here", "-e", "OBSIDIAN_BASE_URL=https://host.docker.internal:27124", "-e", "TRANSPORT_TYPE=stdio", "beshkenadze/mcp-obsidian"],
-      "env": {}
+      "args": ["run", "-i", "beshkenadze/mcp-obsidian"],
+      "env": {
+        "OBSIDIAN_API_KEY": "your_api_key_here",
+        "OBSIDIAN_BASE_URL": "https://host.docker.internal:27124",
+        "TRANSPORT_TYPE": "stdio"
+      }
+    }
+  }
+}
+```
+
+#### Option 2: Using npx with GitHub authentication
+
+This method requires GitHub authentication:
+
+```json
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": ["@beshkenadze/mcp-obsidian"],
+      "env": {
+        "OBSIDIAN_API_KEY": "your_api_key_here",
+        "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org",
+        "NPM_CONFIG__AUTH_TYPES": "legacy",
+        "NPM_CONFIG__AUTHTOKEN": "YOUR_GITHUB_TOKEN",
+        "NPM_CONFIG__REGISTRY_SCOPES": "@beshkenadze",
+        "NPM_CONFIG__REGISTRIES_@BESHKENADZE": "https://npm.pkg.github.com"
+      }
     }
   }
 }
@@ -392,11 +492,12 @@ Many MCP clients like Continue, Cursor, LibreChat, and others support MCP server
 
 ### Installation as a Package
 
-If you want to install the package locally:
+If you want to install the package locally (requires GitHub authentication):
 
 ```bash
 # Add to .npmrc
 @beshkenadze:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
 
 # Then install
 npm install @beshkenadze/mcp-obsidian
@@ -405,6 +506,8 @@ yarn add @beshkenadze/mcp-obsidian
 # or
 bun add @beshkenadze/mcp-obsidian
 ```
+
+> **Note**: For anonymous access without GitHub authentication, use the Docker method described above.
 
 ## Contributing
 
