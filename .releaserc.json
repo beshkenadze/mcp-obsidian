@@ -13,6 +13,14 @@
         "pkgRoot": ".",
         "registry": "https://registry.npmjs.org/"
       }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [],
+        "successComment": "This ${issue.pull_request ? 'pull request' : 'issue'} is included in version ${nextRelease.version}",
+        "failComment": "The release failed due to the following errors:\n- ${errors.map(error => error.message).join('\n- ')}"
+      }
     ]
   ]
 }

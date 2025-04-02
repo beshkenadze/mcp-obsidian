@@ -27,6 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -37,7 +38,7 @@ jobs:
         run: bun install
       
       - name: Install semantic-release dependencies
-        run: bun add -d semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/npm @semantic-release/exec @semantic-release/github @semantic-release/git
+        run: bun add -d semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/npm @semantic-release/github
       
       - name: Run linter
         run: bun run lint
@@ -47,6 +48,14 @@ jobs:
       
       - name: Build
         run: bun run build
+        
+      - name: Setup .npmrc file
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo "always-auth=true" >> .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       
       - name: Semantic Release
         env:
@@ -55,7 +64,7 @@ jobs:
           DRY_RUN: ${{ github.event.inputs.dry-run == 'true' && 'true' || 'false' }}
         run: |
           if [ "$DRY_RUN" = "true" ]; then
-            npx semantic-release --dry-run --debug
+            npx semantic-release --dry-run
           else
-            npx semantic-release --debug
+            npx semantic-release
           fi 

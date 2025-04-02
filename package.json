@@ -9,7 +9,7 @@
     "url": "git+https://github.com/beshkenadze/mcp-obsidian.git"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "start": "bun src/index.ts",
