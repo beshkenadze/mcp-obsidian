@@ -12,14 +12,19 @@
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
+  "bin": {
+    "mcp-obsidian": "dist/stdio.js",
+    "mcp-obsidian-sse": "dist/sse.js"
+  },
   "scripts": {
     "start": "bun src/index.ts",
     "start:sse": "MCP_TRANSPORT=sse LOG_TO_CONSOLE=true bun src/index.ts",
     "start:stdio": "MCP_TRANSPORT=stdio LOG_TO_CONSOLE=true bun src/index.ts",
     "start:supergateway": "bun run src/bin/run-with-supergateway.ts",
-    "build": "bun run build:stdio && bun run build:sse",
+    "build": "bun run build:stdio && bun run build:sse && bun run add-shebang",
     "build:stdio": "MCP_TRANSPORT=stdio bun build src/index.ts --outfile dist/stdio.js --target node",
     "build:sse": "MCP_TRANSPORT=sse bun build src/index.ts --outfile dist/sse.js --target node",
+    "add-shebang": "echo '#!/usr/bin/env node' | cat - dist/stdio.js > /tmp/stdio.js && mv /tmp/stdio.js dist/stdio.js && echo '#!/usr/bin/env node' | cat - dist/sse.js > /tmp/sse.js && mv /tmp/sse.js dist/sse.js && chmod +x dist/stdio.js dist/sse.js",
     "start:node": "node dist/stdio.js",
     "start:node:stdio": "node dist/stdio.js",
     "start:node:sse": "node dist/sse.js",
